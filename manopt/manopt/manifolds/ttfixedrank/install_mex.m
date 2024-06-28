@@ -1,10 +1,27 @@
-% Compiles weingarten_omega.c into a binary mex file.
-% Requires Matlab to have access to a compatible C compiler.
-% If need be, run 'mex -setup' for help installing a compiler.
+% Install helper for mex functions
 
-% This file is part of Manopt: www.manopt.org.
-% Original author: Michael Psenka, Nov. 24, 2020.
-% Contributors: Nicolas Boumal
-% Change log:
+%   TTeMPS Toolbox. 
+%   Michael Steinlechner, 2013-2016
+%   Questions and contact: michael.steinlechner@epfl.ch
+%   BSD 2-clause license, see LICENSE.txt
 
-mex -lmwlapack -lmwblas -largeArrayDims weingarten_omega.c 
+% MAC AND LINUX:
+if strcmp(filesep,'/') 
+    disp('Compiling for Mac or Linux system ...')
+    mex -lmwlapack -lmwblas -largeArrayDims @TTeMPS/subsref_mex.c -outdir @TTeMPS
+    mex -lmwlapack -lmwblas -largeArrayDims @TTeMPS_tangent/TTeMPS_tangent_omega.c -outdir @TTeMPS_tangent
+    mex -lmwlapack -lmwblas -largeArrayDims @TTeMPS_tangent_orth/TTeMPS_tangent_orth_omega.c -outdir @TTeMPS_tangent_orth
+    mex -lmwlapack -lmwblas -largeArrayDims algorithms/completion/als_solve_mex.c -outdir algorithms/completion/
+
+% WINDOWS:
+elseif strcmp(filesep, '\')
+    disp('Compiling for Windows system ...')
+    mex -lmwlapack -lmwblas -largeArrayDims @TTeMPS\subsref_mex.c -outdir @TTeMPS
+    mex -lmwlapack -lmwblas -largeArrayDims @TTeMPS_tangent\TTeMPS_tangent_omega.c -outdir @TTeMPS_tangent
+    mex -lmwlapack -lmwblas -largeArrayDims @TTeMPS_tangent_orth\TTeMPS_tangent_orth_omega.c -outdir @TTeMPS_tangent_orth
+    mex -lmwlapack -lmwblas -largeArrayDims algorithms\completion\als_solve_mex.c -outdir algorithms\completion
+    mex -lmwlapack -lmwblas -largeArrayDims ..\weingarten_omega.c -outdir ..
+
+else
+    disp('Unknown filesep. Compile manually. Aborting.')
+end
