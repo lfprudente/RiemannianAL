@@ -1,6 +1,6 @@
 ## Riemannian and Euclidian augmented Lagrangian algorithms
 
-This directory contains the codes related to the numerical experiments from the article:
+This directory contains the MATLAB codes related to the numerical experiments from the article:
 
 R. Andreani, K. R. Couto, O. P. Ferreira, G. Haeser, and L. F. Prudente, Constraint qualifications for a special class of   nonlinear optimization problems and the strong global convergence properties of an augmented Lagrangian method for embedded submanifold, 2024.
 
