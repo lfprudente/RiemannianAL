@@ -9,8 +9,8 @@ function install_dependencies()
     
     % Compile asa_wrapper.c
     fprintf('Compiling ASA interface with Matlab...\n');
-    mexCmd = sprintf('mex -DMEXPRINTF -DVER30 %s/asa_wrapper.c %s/asa_cg.c -I%s -largeArrayDims', ...
-        asaWrapperDir, asaCGDir, asaCGDir);
+    mexCmd = sprintf('mex -outdir %s -DMEXPRINTF -DVER30 %s/asa_wrapper.c %s/asa_cg.c -I%s -largeArrayDims', ...
+        asaWrapperDir, asaWrapperDir, asaCGDir, asaCGDir);
     eval(mexCmd);
     
     % Add ASA_CG_matlabWrapper to MATLAB path
