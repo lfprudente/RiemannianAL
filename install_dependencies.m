@@ -134,6 +134,8 @@ function [status] = run_sample_problem_manopt()
     problem.cost  = @(x) -x'*(A*x);
     problem.egrad = @(x) -2*A*x;      % notice the 'e' in 'egrad' for Euclidean
 
+    options.tolgradnorm = 10^(-4);
+
     % Numerically check gradient consistency (just once, optional).
     % checkgradient(problem); pause;
 
