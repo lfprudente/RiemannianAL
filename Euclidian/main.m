@@ -3,7 +3,7 @@ clear all
 
 global problemID pairs a b nballs N rankY D
 
-problemID = 3;
+problemID = 2;
 
 % ==================================================================
 
@@ -64,7 +64,7 @@ if ( problemID == 2 )
 
     % Set the number of balls to be packed
 
-    nballs = 20;
+    nballs = 10;
 
     fprintf('nballs = %i \n',nballs)
 
@@ -182,7 +182,7 @@ if ( problemID == 3 )
 
     % Number of points
 
-    N = 300;
+    N = 200;
 
     if N == 200
         rng(2025);

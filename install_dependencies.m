@@ -1,25 +1,44 @@
 function install_dependencies()
+
+    % Installing dependencies
+
     % Define paths
     asaWrapperDir = fullfile(pwd, 'ASA_CG_matlabWrapper');
     asaCGDir = fullfile(pwd, 'ASA_CG-3.0');
     manoptDir = fullfile(pwd, 'manopt');
     
     % Compile asa_wrapper.c
-    fprintf('Compiling asa_wrapper.c...\n');
+    fprintf('Compiling ASA interface with Matlab...\n'));
     mexCmd = sprintf('mex -DMEXPRINTF -DVER30 %s/asa_wrapper.c %s/asa_cg.c -I%s -largeArrayDims', ...
         asaWrapperDir, asaCGDir, asaCGDir);
     eval(mexCmd);
     
     % Add ASA_CG_matlabWrapper to MATLAB path
-    fprintf('Adding ASA_CG_matlabWrapper to MATLAB path...\n');
+    fprintf('Adding ASA_CG_matlabWrapper to MATLAB path...\n\n');
     addpath(asaWrapperDir);
+
+     % Test ASA installation
+    test_asa = input('\n Do you want to test ASA installation with a sample problem? [Y/N] ', 's');
+    if strcmpi(test_asa, 'Y') || strcmpi(test_asa, 'y')
+        fprintf('Running sample problem for ASA...\n');
+        cd('ASA_CG_matlabWrapper');
+        run_sample_problem_ASA();
+        cd('..');
+    end
     
     % Run importmanopt.m to set up Manopt
-    fprintf('Setting up Manopt...\n');
+    fprintf('\n\nInstalling Manopt...\n');
     currentDir = pwd;
     cd(manoptDir);
     importmanopt();
     cd(currentDir);
+
+    % Test Manopt installation
+    test_manopt = input('\n Do you want to test Manopt installation with a sample problem? [Y/N] ', 's');
+    if strcmpi(test_manopt, 'Y') || strcmpi(test_manopt, 'y')
+        fprintf('Running sample problem for Manopt...\n');
+        run_sample_problem_manopt();
+    end
     
     % Save the MATLAB path
     fprintf('Saving the MATLAB path...\n');
@@ -30,11 +49,7 @@ function install_dependencies()
     end
     
     % Confirm installation
-    fprintf('Dependencies installed successfully.\n');
-    
-    % Run sample problems to test the installation
-    run_sample_problem_ASA();
-    run_sample_problem_Manopt();
+    fprintf('\n Dependencies installed successfully.\n');
 end
 
 function run_sample_problem_ASA()
@@ -43,6 +58,7 @@ function run_sample_problem_ASA()
     lo = zeros(n,1);    % lower bound
     hi = ones(n,1);     % upper bound
     x  = ones(n,1);     % initial guess; necessary so that it knows the size of the problem
+    tol = 10^(-8);      % tolerance to optimality
 
     fcn  = 'asa_fcn';
     grad = 'asa_grad'; 
@@ -56,7 +72,7 @@ function run_sample_problem_ASA()
 
     fgopt.n = n;
 
-    [x,status,statistics] = asa_wrapper( x, lo, hi, fcn, grad, fcnGrad, opts, CGopts, fgopt);
+    [x,status,statistics] = asa_wrapper( x, lo, hi, tol,fcn, grad, fcnGrad, opts, CGopts, fgopt);
     
     fprintf('Sample problem for ASA completed.\n');
     fprintf('Status: %d\n', status);

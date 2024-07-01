@@ -5,7 +5,7 @@ global problemID pairs a b nballs N rankY D
 
 format long
 
-problemID = 3;
+problemID = 2;
 
 % ==================================================================
 
