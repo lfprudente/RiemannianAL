@@ -24,6 +24,8 @@ function install_dependencies()
         cd('ASA_CG_matlabWrapper');
         run_sample_problem_ASA();
         cd('..');
+        pause;
+        fprintf('Press any key to continue...\n');
     end
     
     % Run importmanopt.m to set up Manopt
@@ -66,18 +68,16 @@ function run_sample_problem_ASA()
 
     opts = [];
     opts.PrintParms = false;
-    opts.PrintLevel = 0;
-    opts.PrintFinal = false;
+    opts.PrintLevel = 1;
+    opts.PrintFinal = true;
     CGopts = struct('PrintParms',false);
 
     fgopt.n = n;
+    
 
     [x,status,statistics] = asa_wrapper( x, lo, hi, tol,fcn, grad, fcnGrad, opts, CGopts, fgopt);
     
-    fprintf('Sample problem for ASA completed.\n');
-    fprintf('Status: %d\n', status);
-    fprintf('Function value: %f\n', statistics.f);
-    fprintf('Gradient norm: %e\n', statistics.gnorm);
+    fprintf('\n Sample problem for ASA completed.\n');
 end
 
 function run_sample_problem_Manopt()
