@@ -9,52 +9,93 @@ function install_dependencies()
     
     % Compile asa_wrapper.c
     fprintf('Compiling ASA interface with Matlab...\n');
-    mexCmd = sprintf('mex -outdir %s -DMEXPRINTF -DVER30 %s/asa_wrapper.c %s/asa_cg.c -I%s -largeArrayDims', ...
-        asaWrapperDir, asaWrapperDir, asaCGDir, asaCGDir);
-    eval(mexCmd);
-    
-    % Add ASA_CG_matlabWrapper to MATLAB path
-    fprintf('Adding ASA_CG_matlabWrapper to MATLAB path...\n\n');
-    addpath(asaWrapperDir);
+    try
+        mexCmd = sprintf('mex -outdir %s -DMEXPRINTF -DVER30 %s/asa_wrapper.c %s/asa_cg.c -I%s -largeArrayDims', ...
+            asaWrapperDir, asaWrapperDir, asaCGDir, asaCGDir);
+        eval(mexCmd);
+        fprintf('\nASA interface compiled successfully.\n');
 
-     % Test ASA installation
-    test_asa = input('Do you want to test ASA installation with a sample problem? [Y/N] ', 's');
-    if strcmpi(test_asa, 'Y') || strcmpi(test_asa, 'y')
-        fprintf('Running sample problem for ASA...\n');
-        cd('ASA_CG_matlabWrapper');
-        run_sample_problem_ASA();
-        cd('..');  
-        fprintf('Press any key to continue...\n');
-        pause;
+        % Test ASA installation
+        test_asa = input('Do you want to test ASA installation with a sample problem? [Y/N] ', 's');
+        if strcmpi(test_asa, 'Y') || strcmpi(test_asa, 'y')
+            fprintf('Running sample problem for ASA...\n');
+            cd('ASA_CG_matlabWrapper');
+            [flagASA] = run_sample_problem_ASA();
+
+            if ( flagASA == 0 )
+                fprintf('\nASA converged successfully\n');
+            else
+                fprintf('\nASA did not converge as it should.\n');
+            end
+
+            cd('..');  
+            fprintf('\nPress any key to continue...\n');
+            pause;
+        end
+
+        % Add ASA_CG_matlabWrapper to MATLAB path
+        fprintf('Adding ASA_CG_matlabWrapper to MATLAB path...\n\n');
+        addpath(asaWrapperDir);
+    catch
+        fprintf('\nFailed to compile ASA interface.\n');
     end
+
+     
     
     % Run importmanopt.m to set up Manopt
-    fprintf('\n\nInstalling Manopt...\n');
-    currentDir = pwd;
-    cd(manoptDir);
-    importmanopt();
-    cd(currentDir);
+    fprintf('\n\n=================================\n');
+    fprintf('Installing Manopt...\n');
 
-    % Test Manopt installation
-    test_manopt = input('\nDo you want to test Manopt installation with a sample problem? [Y/N] ', 's');
-    if strcmpi(test_manopt, 'Y') || strcmpi(test_manopt, 'y')
-        fprintf('Running sample problem for Manopt...\n');
-        run_sample_problem_manopt();
+    try
+        currentDir = pwd;
+        cd(manoptDir);
+        importmanopt();
+        cd(currentDir);
+
+        % Test Manopt installation
+        test_manopt = input('\nDo you want to test Manopt installation with a sample problem? [Y/N] ', 's');
+        if strcmpi(test_manopt, 'Y') || strcmpi(test_manopt, 'y')
+            fprintf('Running sample problem for Manopt...\n');
+            [flagManopt] = run_sample_problem_manopt();
+
+            if ( flagManopt == 0 )
+                fprintf('\nManopt converged successfully\n');
+            else
+                fprintf('\nManopt did not converge as it should.\n');
+            end
+        end
+
+    catch
+        fprintf('\nFailed to install Manopt.\n');
     end
     
     % Save the MATLAB path
-    fprintf('Saving the MATLAB path...\n');
-    if savepath() == 0
-        fprintf('Path saved successfully.\n');
+    response = input('Save paths for future Matlab sessions? [Y/N] ', 's');
+    if strcmpi(response, 'Y')
+        failed = savepath();
+        if ~failed
+            fprintf('Path saved successfully: no need to call install_dependencies next time.\n');
+        else
+            fprintf(['Failed to save the path. You might need administrator privileges \nto write on pathdef.m?\nPath not saved: ' ...
+                     'please re-call install_dependencies next time.\n']);
+        end
     else
-        fprintf('Failed to save the path. You might need administrator privileges.\n');
+        fprintf('Path not saved: please re-call install_dependencies next time.\n');
     end
     
     % Confirm installation
-    fprintf('\nDependencies installed successfully.\n');
+    if ( flagASA == 0 && flagManopt == 0 )
+        fprintf('\n\nDependencies installed successfully.\n');
+    elseif ( flagASA ~= 0 && flagManopt == 0 )
+        fprintf('\nSomething went wrong with ASA. Manopt is OK.\n');
+    elseif ( flagASA == 0 && flagManopt ~= 0 )
+        fprintf('\nSomething went wrong with Manopt. ASA is OK.\n');
+    else
+        fprintf('\nSomething went wrong both with ASA and Manopt.\n');
+    end
 end
 
-function run_sample_problem_ASA()
+function [status] = run_sample_problem_ASA()
     n = 100;
     lo = zeros(n,1);    % lower bound
     hi = ones(n,1);     % upper bound
@@ -79,7 +120,7 @@ function run_sample_problem_ASA()
     fprintf('Sample problem for ASA completed.\n');
 end
 
-function run_sample_problem_manopt()
+function [status] = run_sample_problem_manopt()
     % Generate random problem data.
     n = 1000;
     A = randn(n);
@@ -98,12 +139,17 @@ function run_sample_problem_manopt()
 
     % Solve.
     [x, xcost, info, options] = rlbfgs(problem);
+    
+    status = - 1;
+    if ( info(end).gradnorm <= options.tolgradnorm )
+        status = 0;
+    end
 
     % Display some statistics.
-    figure;
-    semilogy([info.iter], [info.gradnorm], '.-');
-    xlabel('Iteration number');
-    ylabel('Norm of the Riemannian gradient of f');
+%     figure;
+%     semilogy([info.iter], [info.gradnorm], '.-');
+%     xlabel('Iteration number');
+%     ylabel('Norm of the Riemannian gradient of f');
     
     fprintf('\n');
     fprintf('Sample problem for Manopt completed.\n');
