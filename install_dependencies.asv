@@ -55,6 +55,7 @@ function install_dependencies()
 end
 
 function run_sample_problem_ASA()
+    fprintf('Running a sample problem for ASA...\n');
     n = 100;
     lo = zeros(n,1);    % lower bound
     hi = ones(n,1);     % upper bound
@@ -80,6 +81,7 @@ function run_sample_problem_ASA()
 end
 
 function run_sample_problem_manopt()
+
     % Generate random problem data.
     n = 1000;
     A = randn(n);
