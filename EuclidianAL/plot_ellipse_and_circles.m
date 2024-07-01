@@ -25,6 +25,7 @@ function plot_ellipse_and_circles(a, b, nballs, centers, radii, circle_colors)
         fill(x_circle, y_circle, circle_colors, 'EdgeColor', 'k', 'LineWidth', 2);
 
     end
+    axis off
     
     % Set axis limits
     xlim([- a - radii, a + radii]);
