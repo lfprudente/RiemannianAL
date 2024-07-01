@@ -147,10 +147,7 @@ if ( problemID == 2 )
     
         centers = [xc' yc'];
     
-        printPP = true;
-        name = strcat('Riemannian',int2str(nballs));
-    
-        plot_ellipse_and_circles(a, b, nballs, centers, r, [0.94,0.831,0.827],printPP,name)
+        plot_ellipse_and_circles(a, b, nballs, centers, r, [0.94,0.831,0.827])
     end
     
 end

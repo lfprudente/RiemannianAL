@@ -1,4 +1,4 @@
-function plot_ellipse_and_circles(a, b, nballs, centers, radii, circle_colors,printPP,name)
+function plot_ellipse_and_circles(a, b, nballs, centers, radii, circle_colors)
     % a: semi-major axis length along x-axis
     % b: semi-minor axis length along y-axis
     % nballs: number of circles
@@ -31,12 +31,5 @@ function plot_ellipse_and_circles(a, b, nballs, centers, radii, circle_colors,pr
     xlim([- a - radii, a + radii]);
     ylim([- b - radii, b + radii]);
 
-    set(gcf, 'PaperPosition', [0 0 5 4]); 
-
-    if ( printPP )
-        print(name,'-depsc')
-        saveas(gcf,strcat(name,'.png'))
-    end
-    
     hold off;
 end
