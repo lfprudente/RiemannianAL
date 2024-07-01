@@ -15,24 +15,6 @@ function install_dependencies()
         eval(mexCmd);
         fprintf('\nASA interface compiled successfully.\n');
 
-        % Test ASA installation
-        test_asa = input('Do you want to test ASA installation with a sample problem? [Y/N] ', 's');
-        if strcmpi(test_asa, 'Y') || strcmpi(test_asa, 'y')
-            fprintf('Running sample problem for ASA...\n');
-            cd('ASA_CG_matlabWrapper');
-            [flagASA] = run_sample_problem_ASA();
-
-            if ( flagASA == 0 )
-                fprintf('\nASA converged successfully\n');
-            else
-                fprintf('\nASA did not converge as it should.\n');
-            end
-
-            cd('..');  
-            fprintf('\nPress any key to continue...\n');
-            pause;
-        end
-
         % Add ASA_CG_matlabWrapper to MATLAB path
         fprintf('Adding ASA_CG_matlabWrapper to MATLAB path...\n\n');
         addpath(asaWrapperDir);
@@ -40,7 +22,23 @@ function install_dependencies()
         fprintf('\nFailed to compile ASA interface.\n');
     end
 
-     
+    % Test ASA installation
+    test_asa = input('Do you want to test ASA installation with a sample problem? [Y/N] ', 's');
+    if strcmpi(test_asa, 'Y') || strcmpi(test_asa, 'y')
+        fprintf('Running sample problem for ASA...\n');
+        cd('ASA_CG_matlabWrapper');
+        [flagASA] = run_sample_problem_ASA();
+
+        if ( flagASA == 0 )
+            fprintf('\nASA converged successfully\n');
+        else
+            fprintf('\nASA did not converge as it should.\n');
+        end
+
+        cd('..');  
+        fprintf('\nPress any key to continue...\n');
+        pause;
+    end
     
     % Run importmanopt.m to set up Manopt
     fprintf('\n\n=================================\n');
@@ -51,22 +49,21 @@ function install_dependencies()
         cd(manoptDir);
         importmanopt();
         cd(currentDir);
-
-        % Test Manopt installation
-        test_manopt = input('\nDo you want to test Manopt installation with a sample problem? [Y/N] ', 's');
-        if strcmpi(test_manopt, 'Y') || strcmpi(test_manopt, 'y')
-            fprintf('Running sample problem for Manopt...\n');
-            [flagManopt] = run_sample_problem_manopt();
-
-            if ( flagManopt == 0 )
-                fprintf('\nManopt converged successfully\n');
-            else
-                fprintf('\nManopt did not converge as it should.\n');
-            end
-        end
-
     catch
         fprintf('\nFailed to install Manopt.\n');
+    end
+
+    % Test Manopt installation
+    test_manopt = input('\nDo you want to test Manopt installation with a sample problem? [Y/N] ', 's');
+    if strcmpi(test_manopt, 'Y') || strcmpi(test_manopt, 'y')
+        fprintf('Running sample problem for Manopt...\n');
+        [flagManopt] = run_sample_problem_manopt();
+
+        if ( flagManopt == 0 )
+            fprintf('\nManopt converged successfully\n');
+        else
+            fprintf('\nManopt did not converge as it should.\n');
+        end
     end
     
     % Save the MATLAB path
@@ -122,6 +119,8 @@ end
 
 function [status] = run_sample_problem_manopt()
     % Generate random problem data.
+
+    rng(2024);
     n = 1000;
     A = randn(n);
     A = .5*(A+A');
@@ -129,6 +128,8 @@ function [status] = run_sample_problem_manopt()
     % Create the problem structure.
     manifold = spherefactory(n);
     problem.M = manifold;
+
+    x = manifold.rand();
 
     % Define the problem cost function and its Euclidean gradient.
     problem.cost  = @(x) -x'*(A*x);
