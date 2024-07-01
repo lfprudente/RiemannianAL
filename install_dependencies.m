@@ -36,7 +36,7 @@ function install_dependencies()
     cd(currentDir);
 
     % Test Manopt installation
-    test_manopt = input('\n Do you want to test Manopt installation with a sample problem? [Y/N] ', 's');
+    test_manopt = input('\nDo you want to test Manopt installation with a sample problem? [Y/N] ', 's');
     if strcmpi(test_manopt, 'Y') || strcmpi(test_manopt, 'y')
         fprintf('Running sample problem for Manopt...\n');
         run_sample_problem_manopt();
@@ -51,7 +51,7 @@ function install_dependencies()
     end
     
     % Confirm installation
-    fprintf('\n Dependencies installed successfully.\n');
+    fprintf('\nDependencies installed successfully.\n');
 end
 
 function run_sample_problem_ASA()
