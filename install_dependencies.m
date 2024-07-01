@@ -8,7 +8,7 @@ function install_dependencies()
     manoptDir = fullfile(pwd, 'manopt');
     
     % Compile asa_wrapper.c
-    fprintf('Compiling ASA interface with Matlab...\n'));
+    fprintf('Compiling ASA interface with Matlab...\n');
     mexCmd = sprintf('mex -DMEXPRINTF -DVER30 %s/asa_wrapper.c %s/asa_cg.c -I%s -largeArrayDims', ...
         asaWrapperDir, asaCGDir, asaCGDir);
     eval(mexCmd);
