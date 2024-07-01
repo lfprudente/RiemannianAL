@@ -94,7 +94,7 @@ function run_sample_problem_manopt()
     problem.egrad = @(x) -2*A*x;      % notice the 'e' in 'egrad' for Euclidean
 
     % Numerically check gradient consistency (just once, optional).
-    checkgradient(problem); pause;
+    % checkgradient(problem); pause;
 
     % Solve.
     [x, xcost, info, options] = rlbfgs(problem);
