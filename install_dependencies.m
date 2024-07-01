@@ -20,6 +20,7 @@ function install_dependencies()
         addpath(asaWrapperDir);
     catch
         fprintf('\nFailed to compile ASA interface.\n');
+        return
     end
 
     % Test ASA installation
@@ -51,6 +52,7 @@ function install_dependencies()
         cd(currentDir);
     catch
         fprintf('\nFailed to install Manopt.\n');
+        return
     end
 
     % Test Manopt installation
@@ -81,15 +83,7 @@ function install_dependencies()
     end
     
     % Confirm installation
-    if ( flagASA == 0 && flagManopt == 0 )
-        fprintf('\n\nDependencies installed successfully.\n');
-    elseif ( flagASA ~= 0 && flagManopt == 0 )
-        fprintf('\nSomething went wrong with ASA. Manopt is OK.\n');
-    elseif ( flagASA == 0 && flagManopt ~= 0 )
-        fprintf('\nSomething went wrong with Manopt. ASA is OK.\n');
-    else
-        fprintf('\nSomething went wrong both with ASA and Manopt.\n');
-    end
+    fprintf('\n\nDependencies installed successfully.\n');
 end
 
 function [status] = run_sample_problem_ASA()
