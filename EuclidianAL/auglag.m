@@ -1,10 +1,10 @@
-function [x,lambda,f,outiter,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling)
+function [x,lambda,f,outiter,csupn,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling)
 
 global evalfun evalgrad nevalal nevalnal
 
 %  Parameters
 
-epsopt    = 10^(-5);
+epsopt    = 10^(-4);
 epsfeas   = 10^(-5);
 efstain   = sqrt(epsfeas);
 eostain   = epsopt^(3/2);
@@ -286,12 +286,20 @@ while (1)
     % Set penalty parameter
     % ==================================================================
     
-    %if ( outiter == 1 || outiter == 2 ) 
     if ( outiter == 1 || outiter == 2 )
-        [rho] = comprhoini(c,f,E,I);
+
+        [rho] = comprhoini(cs,fs,E,I);
+
+        rhoa = 10^(-8);
+        rhob = 10^8;
+        rhoc = 10^(-8);
+
     elseif ( max( snorm, csupn ) > epsfeas && snorm > rhofrac * snormprev )
+
         rho = rhomult * rho;
+
     elseif ( cifacnt >= 2 )
+
         rhoa = min( rhoa * rhomult, 1 );
         rhob = max( rhob / rhomult, 1 );
         rhoc = rhoc * rhomult;

@@ -3,7 +3,7 @@ clear all
 
 global problemID pairs a b nballs N rankY D
 
-problemID = 2;
+problemID = 3;
 
 % ==================================================================
 
@@ -34,7 +34,7 @@ if ( problemID == 1 )
 
     % Checking derivatives?
     
-    checkder = true;
+    checkder = false;
     
     % Scale the problem?
     
@@ -51,7 +51,7 @@ if ( problemID == 1 )
 
     % Call Euclidian-AL
 
-    [x,lambda,f,iter,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling);
+    [x,lambda,f,iter,csupn,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling);
 
     return
 end
@@ -64,7 +64,7 @@ if ( problemID == 2 )
 
     % Set the number of balls to be packed
 
-    nballs = 10;
+    nballs = 3;
 
     fprintf('nballs = %i \n',nballs)
 
@@ -149,8 +149,8 @@ if ( problemID == 2 )
 
     % Call Euclidian-AL
     
-    [x,lambda,f,iter,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling);
-        
+    [x,lambda,f,iter,csupn,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling);
+            
     if ( print )
 
         u = [];
@@ -180,72 +180,71 @@ end
 
 if ( problemID == 3 )
 
-    % Number of points
+    problem_name = 'synthetic';
 
-    N = 200;
-
-    if N == 200
-        rng(2025);
-    elseif N == 300
-        rng(2026);
-    elseif N == 400
-        rng(2027);
-    elseif N == 500
-        rng(2028);
-    elseif N == 800
-        rng(2029);
-    elseif N == 1000
-        rng(2030);
-    else
-        rng(2024);
-    end
-        
-    % Generate data points
-    
-    a = 1;
-    b = 4;
-    
-    data = [];
-    
-    if ( N == 200 || N == 300 || N == 400 || N == 500 )
-
-        % Number of clusters
+    if ( strcmp(problem_name, 'wdbc') == 1 )
+        N = 569;
+        k = 2;
+    elseif ( strcmp(problem_name, 'cloud') == 1 )
+        N = 2048;
+        k = 2;
+    elseif ( strcmp(problem_name, 'ecoli') == 1 )
+        N = 336;
+        k = 8;
+    elseif ( strcmp(problem_name, 'ionosphere') == 1 )
+        N = 351;
+        k = 2;
+    elseif ( strcmp(problem_name, 'iris') == 1 )
+        N = 150;
+        k = 3;
+    elseif ( strcmp(problem_name, 'parkinsons') == 1 )
+        N = 195;
+        k = 2;
+    elseif ( strcmp(problem_name, 'pima') == 1 )
+        N = 768;
+        k = 2;
+    elseif ( strcmp(problem_name, 'raisin') == 1 )
+        N = 900;
+        k = 2;
+    elseif ( strcmp(problem_name, 'seeds') == 1 )
+        N = 210;
+        k = 3;
+   elseif ( strcmp(problem_name, 'SPECTF') == 1 )
+        N = 267;
+        k = 2;  
+    elseif ( strcmp(problem_name, 'transfusion') == 1 )
+        N = 748;
+        k = 2;
+    elseif ( strcmp(problem_name, 'thyroid') == 1 )
+        N = 215;
+        k = 3; 
+    elseif ( strcmp(problem_name, 'wine') == 1 )
+        N = 178;
+        k = 3;
+    elseif ( strcmp(problem_name, 'synthetic') == 1 )
+        N = 500;
         k = 3;
 
-        % References points
-        centroids = [3, 3; -3, -3; 6, -6];
-    else
-        % Number of clusters
-        k = 2; 
-
-        % References points
-        centroids = [3, 3; -3, -3];
+        % Print solution?
+        print = true;
     end
 
-    points_per_cluster = floor(N / k);
-    
-    for i = 1:k
-        dispersion_factor = ( b - a ) * rand(points_per_cluster,1) + a;
-        data = [data; centroids(i, :) + dispersion_factor .* randn(points_per_cluster, 2)];
-    end
-    
-    % Add extra points if N is not exactly divisible by k
+    addpath(fullfile('..','kmeansdata'));
 
-    remaining_points = N - points_per_cluster * k;
-    if remaining_points > 0
-        dispersion_factor = ( b - a ) * rand(remaining_points,1) + a;
-        data = [data; centroids(1:remaining_points, :) + dispersion_factor .* randn(remaining_points, 2)];
-    end
-    
+    [data,true_labels] = datacleaner(problem_name,N,k);
+
+    [nrow,ncol] = size(data);
+
+    fprintf('Problem    : %s\n', problem_name);
+    fprintf('Data(N)    : %d\n', nrow);
+    fprintf('Features(l): %d\n', ncol);
+    fprintf('Clusters(k): %d\n\n', k);
+
     rng(2024);
 
     % Set matrix D
    
     D = data * data.';
-
-    % Print solution?
-
-    print = true;
     
     % Number of variables
 
@@ -278,9 +277,17 @@ if ( problemID == 3 )
 
     % Set initial guess
 
-    M = stiefelfactory(N, rankY);
-    problem.M = M;
-    x = M.rand();
+    pos = randi(k,N,1);
+
+    x = zeros(N,k);
+
+    for i = 1:k
+        x(pos==i,i) = 1;
+    end
+
+    for i = 1:k
+        x(:,i) = x(:,i)/norm(x(:,i));
+    end   
 
     x = x(:);
 
@@ -292,32 +299,17 @@ if ( problemID == 3 )
 
     % Call Euclidian-AL
             
-    [x,lambda,f,iter,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling);
+    [x,lambda,f,iter,csupn,time,nevalal,nevalnal,alinfo] = auglag(n,m,l,u,x,equatn,lambda,scaling);
 
-    if ( print )
-        Y = reshape(x, [N, rankY]);
-        
-        for i = 1:N
-          [~,j] = max(Y(i,:));
-          Y(i,:) = 0;
-          Y(i,j) = 1;
-        end
-
-        centroids = (Y' * data) ./ sum(Y', 2);
-  
-        figure;
-        hold on;
-    
-        colors = {'k','r','b'};
-        marker = {'o','s','^'};
-    
-        axis off
-
-        for j = 1:rankY
-            cluster_points = data(Y(:, j) == 1, :);
-            scatter(cluster_points(:, 1), cluster_points(:, 2), 36, colors{j},marker{j},'filled');
-            %scatter(centroids(j, 1), centroids(j, 2), 300, 'y', 'pentagram', 'filled');
-        end
-
+    if ( alinfo == 0 && strcmp(problem_name, 'synthetic') ~= 1 )
+        [accuracy] = analyses(x,N,k,true_labels);
+        fprintf('Feas    : %7.1e \n', csupn);
+        fprintf('Accuracy: %.1f \n', accuracy);
     end
+
+    if ( strcmp(problem_name, 'synthetic') == 1 && print )
+        plot_kmeans(x,N,k,data)
+    end
+
+    rmpath(fullfile('..','kmeansdata'));
 end

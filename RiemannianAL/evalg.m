@@ -38,7 +38,7 @@ if ( problemID == 3 )
     flag = 0;
     
     if ( size(x,2) == 1 )
-        [x] = reshapevector(x)
+        [x] = reshapevector(x);
     end
 
     g = D * x;
