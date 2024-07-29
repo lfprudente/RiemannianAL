@@ -2,7 +2,7 @@
 
 This directory contains the MATLAB codes related to the numerical experiments from the article:
 
-R. Andreani, K. R. Couto, O. P. Ferreira, G. Haeser, and L. F. Prudente, Constraint qualifications for a special class of   nonlinear optimization problems and the strong global convergence properties of an augmented Lagrangian method for embedded submanifold, 2024.
+R. Andreani, K. R. Couto, O. P. Ferreira, G. Haeser, and L. F. Prudente, Global convergence of an augmented Lagrangian method for nonlinear programming via Riemannian optimization, 2024.
 
 - __RiemannianAL__: Contains the codes for the Riemannian augmented Lagrangian algorithm (Riemannian-AL)
 - __EuclidianAL__: Contains the codes for the Euclidean augmented Lagrangian algorithm (Euclidean-AL)
